@@ -20,13 +20,13 @@ model Usuarios {
   password   String @db.VarChar(100)
 
   rol            Roles    @relation(fields: [usuario_rol_id], references: [rol_id])
-  usuario_rol_id Int
+  usuario_rol_id Int @default(2)
   tareas         Tareas[]
 }
 
 model Roles {
-  rol_id     Int    @id @default(autoincrement())
-  rol_nombre String @unique @db.VarChar(50)
+  rol_id     Int        @id @default(autoincrement())
+  rol_nombre RolUsuario @unique
 
   usuarios Usuarios[]
 }
@@ -39,7 +39,7 @@ model Tareas {
   estado            EstadoTareas @default(pendiente)
   fecha_limite      DateTime?    @db.Date
 
-  usuario          Usuarios @relation(fields: [tarea_usuario_id], references: [usuario_id])
+  usuario          Usuarios @relation(fields: [tarea_usuario_id], references: [usuario_id], onDelete: Cascade)
   tarea_usuario_id Int
 }
 
@@ -47,4 +47,9 @@ enum EstadoTareas {
   pendiente
   progreso
   terminado
+}
+
+enum RolUsuario {
+  admin
+  usuario
 }

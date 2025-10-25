@@ -6,7 +6,8 @@ import AuthRouter from "./routes/Auth.Routes.js";
 import { verifyAuth } from "./middlewares/VerifyToken.middleware.js";
 import UsuarioRoutes from "./routes/Usuario.Routes.js";
 import TareaRoutes from "./routes/Tarea.Routes.js";
-
+import { verfiyRol } from "./middlewares/VerifyRol.middleware.js";
+import AdminRoutes from "./routes/Admin.Routes.js"
 dotenv.config();
 
 const app = expres();
@@ -18,9 +19,12 @@ app.use(cookieParser());
 //auth
 app.use("/auth", AuthRouter);
 
-//obtener datos del usuario pagina principal
-app.use("/home", verifyAuth, UsuarioRoutes);
-app.use("/tarea",verifyAuth,TareaRoutes);
+//pagina principal
+app.use("/home", verifyAuth, verfiyRol(1, 2), UsuarioRoutes);
+app.use("/tarea", verifyAuth, verfiyRol(1, 2), TareaRoutes);
+
+//admin
+app.use("/admin",verifyAuth,verfiyRol(1),AdminRoutes)
 
 // middleware de errores
 app.use((err, req, res, next) => {

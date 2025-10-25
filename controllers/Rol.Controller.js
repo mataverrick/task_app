@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const postRol = async (req, res) => {
+export const crearRol = async (req, res) => {
   try {
     const { rol_nombre } = req.body;
 
