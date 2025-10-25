@@ -2,11 +2,10 @@ import expres from "express";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
-import { postUsuario } from "./controllers/Usuario.Controller.js";
+import AuthRouter from "./routes/Auth.Routes.js";
 import { verifyAuth } from "./middlewares/VerifyToken.middleware.js";
-import { loginUsuario, logout } from "./auth/Auth.Controller.js";
-import { refreshToken } from "./utils/token.utils.js";
-import { catchAsync } from "./utils/catchAync.js";
+import UsuarioRoutes from "./routes/Usuario.Routes.js";
+import TareaRoutes from "./routes/Tarea.Routes.js";
 
 dotenv.config();
 
@@ -16,19 +15,15 @@ app.use(cors());
 app.use(expres.json());
 app.use(cookieParser());
 
-// app.post("/", postRol);
 //auth
-app.post("/login", catchAsync(loginUsuario));
-app.post("/signup", catchAsync(postUsuario));
-app.post("/logout", catchAsync(logout));
-app.post("/refresh", refreshToken);
+app.use("/auth", AuthRouter);
 
-app.use("/home", verifyAuth);
+//obtener datos del usuario pagina principal
+app.use("/home", verifyAuth, UsuarioRoutes);
+app.use("/tarea",verifyAuth,TareaRoutes);
 
 // middleware de errores
 app.use((err, req, res, next) => {
-
-
   res.status(500).json({ error: err.message });
 });
 

@@ -1,16 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../utils/bcrypt.utils.js";
 import { createToken } from "../utils/token.utils.js";
+import { ValidationError } from "../errors/ValidationError.js";
 
 const prisma = new PrismaClient();
 
-export const postUsuario = async (req, res) => {
+export const crearUsuario = async (req, res) => {
   const { nombre, email, password } = req.body;
 
   try {
-    if (!nombre) throw new Error("El nombre es obligatorio");
-    if (!email) throw new Error("El email es obligatorio");
-    if (!password) throw new Error("El password es obligatorio");
+    if (!nombre) throw new ValidationError("El nombre es obligatorio");
+    if (!email) throw new ValidationError("El email es obligatorio");
+    if (!password) throw new ValidationError("El password es obligatorio");
     //falta mejorar validaciones, solo es provicional para tener algo funcional
 
     const hashedPassword = await hashPassword(password);
@@ -42,9 +43,19 @@ export const postUsuario = async (req, res) => {
   }
 };
 
-export const getUser = async (req, res) => {
-  try {
-  } catch (error) {}
+export const obtenerUsuario = async(req, res) => {
+  const { usuario_id, usuario_rol_id } = req.payload;
 
-  res.status(204);
+  const usuario = await prisma.usuarios.findMany({
+    where: {
+      usuario_id,
+    },
+    include: {
+      tareas: true,
+    },
+  });
+
+  res.json(usuario);
 };
+
+

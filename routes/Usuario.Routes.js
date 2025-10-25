@@ -1,11 +1,9 @@
 import { Router } from "express";
-import { getUser } from "../controllers/Usuario.Controller.js";
+import { obtenerUsuario } from "../controllers/Usuario.Controller.js";
+import { catchAsync } from "../utils/catchAync.js";
 
 const router = Router();
 
+router.get("/dashboard", catchAsync(obtenerUsuario));
 
-
-router.get("/",getUser)
-
-
-export default router
+export default router;

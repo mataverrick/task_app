@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { AuthError } from "../errors/AuthError.js";
 
 dotenv.config();
 
@@ -10,11 +11,11 @@ export const createToken = ({ usuario_id, usuario_rol_id }) => {
   };
 
   const access_token = jwt.sign(payload, process.env.SECRET_ACCESS_KEY, {
-    expiresIn: "15m",
+    expiresIn: "2h",
   });
 
   const refresh_token = jwt.sign(payload, process.env.SECRET_REFRESH_KEY, {
-    expiresIn: "2h",
+    expiresIn: "7h",
   });
 
   return { access_token, refresh_token };
@@ -27,24 +28,17 @@ export const validateToken = (token) => {
 export const refreshToken = (req, res) => {
   const refreshToken = req.cookies.refresh_token;
 
-  if (!refreshToken)
-    return res.status(401).json({ mensaje: "No hay token de refresco" });
+  if (!refreshToken) throw new AuthError("No cuentas con un token");
 
-  try {
-    const decode = jwt.verify(refreshToken, process.env.SECRET_REFRESH_KEY);
+  const decode = jwt.verify(refreshToken, process.env.SECRET_REFRESH_KEY);
 
-    const newAccesToken = jwt.sign(
-      { usuario_id: decode.usuario_id,
-        usuario_rol_id : decode.usuario_rol_id
-      },
-      process.env.SECRET_ACCESS_KEY,
-      {
-        expiresIn: "15m",
-      }
-    );
+  const newAccesToken = jwt.sign(
+    { usuario_id: decode.usuario_id, usuario_rol_id: decode.usuario_rol_id },
+    process.env.SECRET_ACCESS_KEY,
+    {
+      expiresIn: "2h",
+    }
+  );
 
-    res.json({ accessToken: newAccesToken });
-  } catch (error) {
-    res.json({ error: error.message });
-  }
+  res.json({ accessToken: newAccesToken });
 };
